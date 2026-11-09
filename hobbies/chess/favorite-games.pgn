@@ -1,0 +1,15 @@
+[Event "Rated Bullet Game"]
+[Site "Chess.com"]
+[Date "2024.03.15"]
+[White "JohanSofalas"]
+[Black "Opponent"]
+[Result "1-0"]
+[WhiteElo "1805"]
+[BlackElo "1790"]
+[TimeControl "60+0"]
+[Termination "JohanSofalas won by resignation"]
+
+1. c4 e5 2. Nc3 Nf6 3. Nf3 Nc6 4. g3 d5 5. cxd5 Nxd5 6. Bg2 Nb6 7. O-O Be7 
+8. a3 O-O 9. b4 Be6 10. Rb1 f6 11. d3 a5 12. b5 Nd4 13. Nd2 c6 14. e3 Nf5 
+15. bxc6 bxc6 16. Bxc6 Rc8 17. Be4 Rxc3 18. Bxf5 Bxf5 19. Rxb6 Qxb6 
+20. Nc4 Qc5 21. e4 Be6 22. Bb2 Rxc4 23. dxc4 Qxc4 1-0
