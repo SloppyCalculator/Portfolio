@@ -2,7 +2,9 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#050505">
+    <meta name="color-scheme" content="dark">
     <title>Johan Sofalas - 3D Chess Portfolio</title>
     
     <!-- Dependencies: Tailwind CSS, Three.js, GSAP -->
@@ -135,7 +137,7 @@
             box-shadow: 0 20px 40px rgba(0,0,0,0.85), inset 0 2px 4px rgba(255,255,255,0.15), inset 0 -3px 6px rgba(0,0,0,0.7);
             padding: 5px;
             width: 100%;
-            max-width: min(100%, 65vh);
+            max-width: min(100%, 65dvh);
             aspect-ratio: 1 / 1;
             display: flex;
             flex-direction: column;
@@ -405,6 +407,60 @@
             content: '_'; animation: blink 1s step-end infinite;
         }
         @keyframes blink { 50% { opacity: 0; } }
+
+        /* ---------- Responsive / cross-device layer ---------- */
+        html { -webkit-text-size-adjust: 100%; }
+        button, a, .menu-btn { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+        #canvas-container canvas { display: block; touch-action: manipulation; }
+        .app-shell { height: 100vh; height: 100dvh; }
+        #close-overlay { min-width: 44px; min-height: 44px; }
+        #content-overlay { padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); }
+        .custom-scrollbar, .notebook-scroll { -webkit-overflow-scrolling: touch; overscroll-behavior: contain; }
+        :focus-visible { outline: 2px solid #ff5e00; outline-offset: 2px; }
+
+        /* Phones & small tablets (portrait): nav becomes a bottom dock */
+        @media (max-width: 767px) {
+            .app-shell { align-items: flex-end; }
+            #side-nav {
+                width: 100%; height: auto; max-height: 45dvh;
+                border-right: 0; border-top: 1px solid rgba(255,255,255,0.1);
+                padding-bottom: env(safe-area-inset-bottom);
+            }
+            #side-nav > div:first-child { padding: 0.75rem 1rem; }
+            #side-nav > div:first-child h1 { font-size: 1rem; }
+            #side-nav > div:first-child p:last-child { display: none; }  /* hide quote */
+            #menu-items {
+                flex: none; flex-direction: row; overflow-x: auto; overflow-y: hidden;
+                padding: 0.6rem 0.75rem; gap: 0.5rem; scroll-snap-type: x proximity;
+            }
+            #menu-items .menu-btn { flex: 0 0 auto; padding: 0.6rem 0.9rem; scroll-snap-align: start; white-space: nowrap; }
+            #side-nav > div:last-child { padding: 0.5rem 1rem; margin-top: 0; }
+
+            #close-overlay { top: calc(env(safe-area-inset-top) + 0.5rem) !important; right: 0.75rem !important; padding: 0.5rem !important; }
+            #close-overlay svg { width: 1.5rem; height: 1.5rem; }
+            #content-overlay .custom-scrollbar.flex-1 { padding: 3.5rem 0.75rem 1rem !important; }
+            #overlay-content { margin-top: 0 !important; }
+        }
+
+        /* Landscape phones / very short screens: slimmer sidebar */
+        @media (min-width: 768px) and (max-height: 520px) {
+            #side-nav { width: 14rem; }
+            #side-nav > div:first-child { padding: 0.75rem 1rem; }
+            #side-nav > div:first-child p:last-child { display: none; }
+            #menu-items { padding: 0.5rem 0.75rem; gap: 0.35rem; }
+            #menu-items .menu-btn { padding: 0.5rem 0.75rem; }
+            #close-overlay { top: 0.5rem !important; right: 0.75rem !important; }
+        }
+        @media (max-width: 767px) and (orientation: landscape) { #side-nav { max-height: 60dvh; } }
+
+        /* Touch screens: don't leave hover states "stuck" after a tap */
+        @media (hover: none) {
+            .book-spine:hover { transform: none; box-shadow: -5px 0 15px rgba(0,0,0,0.8), inset 2px 0 5px rgba(255,255,255,0.05); }
+            .cassette:hover { transform: none; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+        }
     </style>
 </head>
 <body class="text-gray-200 font-sans antialiased">
@@ -412,8 +468,8 @@
     <div id="canvas-container"></div>
 
     <!-- Left Sidebar Navigation -->
-    <div class="relative z-10 flex h-screen pointer-events-none">
-        <nav class="w-80 glass-panel flex flex-col pointer-events-auto h-full border-r border-white/10">
+    <div class="app-shell relative z-10 flex h-screen pointer-events-none">
+        <nav id="side-nav" aria-label="Portfolio sections" class="w-80 glass-panel flex flex-col pointer-events-auto h-full border-r border-white/10">
             <div class="p-8 border-b border-white/10">
                 <h1 class="text-xl font-semibold tracking-wider text-white flex items-center gap-3 leading-snug">
                     <span class="w-3 h-3 rounded-full bg-neon shadow-[0_0_15px_#ff5e00] flex-shrink-0"></span>
@@ -423,7 +479,7 @@
                 <p class="text-sm text-gray-400 mt-5 italic border-l-2 border-neon pl-4 py-1 font-serif">"To be, or not to be:<br>that is the question."</p>
             </div>
 
-            <div class="flex-1 overflow-y-auto py-6 flex flex-col gap-3 px-6 custom-scrollbar" id="menu-items">
+            <div class="flex-1 overflow-y-auto py-6 flex flex-col gap-3 px-6 custom-scrollbar" id="menu-items" role="list">
                 <!-- Move Buttons -->
                 <button class="menu-btn group relative flex items-center justify-between p-4 rounded-xl hover:bg-white/5 transition-all duration-300 border border-transparent hover:border-neon/40 text-left" data-id="d4" data-source="d2" data-target="d4">
                     <div>
@@ -462,7 +518,7 @@
             </div>
 
             <div class="p-6 border-t border-white/10 flex justify-between items-center text-gray-400 mt-auto">
-                <a href="www.linkedin.com/in/johan-sofalas-581393287" target="_blank" class="hover:text-neon transition-colors duration-300 transform hover:scale-110" title="LinkedIn">
+                <a href="https://www.linkedin.com/in/johan-sofalas-581393287" target="_blank" rel="noopener noreferrer" class="hover:text-neon transition-colors duration-300 transform hover:scale-110" title="LinkedIn">
                     <i class="fab fa-linkedin-in text-xl"></i>
                 </a>
                 <a href="https://x.com/JSofalas" target="_blank" class="hover:text-neon transition-colors duration-300 transform hover:scale-110" title="Twitter">
@@ -482,7 +538,7 @@
     <div id="content-overlay" class="fixed inset-0 z-50 flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-500 bg-black/70 backdrop-blur-xl">
         <div class="glass-panel w-full h-full flex flex-col transform scale-95 transition-all duration-500 overflow-hidden relative border-0 rounded-none" id="overlay-modal">
             
-            <button id="close-overlay" class="absolute top-8 right-8 z-20 text-gray-400 hover:text-neon transition-colors bg-white/5 p-3 rounded-full border border-white/10 hover:bg-white/10 hover:shadow-[0_0_15px_rgba(255,94,0,0.3)]">
+            <button id="close-overlay" aria-label="Close" class="absolute top-8 right-8 z-20 text-gray-400 hover:text-neon transition-colors bg-white/5 p-3 rounded-full border border-white/10 hover:bg-white/10 hover:shadow-[0_0_15px_rgba(255,94,0,0.3)]">
                 <svg class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                 </svg>
@@ -574,7 +630,7 @@
             `).join('');
 
             return `
-                <div class="flex flex-col h-[85vh] w-full bg-white rounded-xl border border-white/20 shadow-2xl relative select-none font-sans overflow-hidden">
+                <div class="flex flex-col h-[85dvh] w-full bg-white rounded-xl border border-white/20 shadow-2xl relative select-none font-sans overflow-hidden">
                     <!-- Browser Header -->
                     <div class="bg-[#e5e5e5] h-12 flex items-center px-4 border-b border-gray-300 shrink-0">
                         <div class="flex gap-2">
@@ -607,7 +663,7 @@
                         
                         <!-- Main Content -->
                         <div class="flex-1 overflow-y-auto p-6 md:p-10 custom-scrollbar relative">
-                            <div class="flex items-center gap-4 mb-10 border-b border-gray-200 pb-6">
+                            <div class="flex flex-wrap items-center gap-x-4 gap-y-2 mb-10 border-b border-gray-200 pb-6">
                                 <div class="text-3xl font-bold tracking-tight flex items-center">
                                     <span class="text-[#4285F4]">G</span><span class="text-[#EA4335]">o</span><span class="text-[#FBBC05]">o</span><span class="text-[#4285F4]">g</span><span class="text-[#34A853]">l</span><span class="text-[#EA4335]">e</span>
                                     <span class="text-gray-500 font-normal ml-2 text-2xl">Scholar</span>
@@ -646,7 +702,7 @@
 
         function renderCreativeWorks() {
             return `
-                <div id="view-bookshelf" class="view-section active-view flex-col items-center justify-center p-4 min-h-[60vh]">
+                <div id="view-bookshelf" class="view-section active-view flex-col items-center justify-center p-4 min-h-[60dvh]">
                     <div class="text-center mb-16">
                         <h1 class="text-4xl font-sans font-bold tracking-wider mb-3"><span class="text-neon">/</span> CREATIVE WORKS</h1>
                         <p class="text-gray-400 font-mono text-sm">Select a volume to begin reading.</p>
@@ -675,7 +731,7 @@
                     </div>
                 </div>
 
-                <div id="view-notebook" class="view-section hidden-view flex-col h-[75vh] bg-[#050505] rounded-xl border border-white/10 overflow-hidden shadow-2xl relative">
+                <div id="view-notebook" class="view-section hidden-view flex-col h-[75dvh] bg-[#050505] rounded-xl border border-white/10 overflow-hidden shadow-2xl relative">
                     <div class="h-20 border-b border-white/10 flex items-center justify-between px-8 shrink-0 bg-[#0f0f0f]">
                         <button id="btn-back" class="group flex items-center gap-3 text-gray-400 hover:text-white transition-colors z-10">
                             <div class="w-8 h-8 rounded-full border border-gray-600 group-hover:border-neon flex items-center justify-center group-hover:shadow-[0_0_10px_rgba(255,94,0,0.5)] transition-all">
@@ -933,12 +989,12 @@
 
         function renderScrabbleBoard() {
             return `
-                <div class="flex flex-col h-[85vh] w-full bg-[#050505] rounded-xl border border-white/10 overflow-hidden shadow-2xl relative select-none">
+                <div class="flex flex-col h-[85dvh] w-full bg-[#050505] rounded-xl border border-white/10 overflow-hidden shadow-2xl relative select-none">
                     <div class="flex flex-1 overflow-hidden flex-col lg:flex-row">
                         <!-- Left: Game Board -->
-                        <div class="flex-1 bg-[#061209] relative flex flex-col items-center justify-center p-2 sm:p-3 lg:p-4 overflow-auto custom-scrollbar border-b lg:border-b-0 lg:border-r border-white/10 min-h-[50vh]">
+                        <div class="flex-1 bg-[#061209] relative flex flex-col items-center justify-center p-2 sm:p-3 lg:p-4 overflow-auto custom-scrollbar border-b lg:border-b-0 lg:border-r border-white/10 min-h-[50dvh]">
                             <!-- Top Bar: DECRYPT Title, Score, and Auto-Fill Button -->
-                            <div class="w-full flex items-center justify-between mb-2 px-1 max-w-[min(100%,65vh)] shrink-0">
+                            <div class="w-full flex items-center justify-between mb-2 px-1 max-w-[min(100%,65dvh)] shrink-0">
                                 <div>
                                     <h1 class="text-base sm:text-lg lg:text-xl font-bold tracking-widest text-white flex items-center gap-2">
                                         <div class="w-2.5 h-2.5 bg-neon rounded-full shadow-[0_0_10px_#ff5e00]"></div>
@@ -992,7 +1048,7 @@
                         </div>
 
                         <!-- Right: Reading Pane -->
-                        <div class="w-full lg:w-[360px] xl:w-[420px] bg-[#0a0a0a] p-5 lg:p-7 flex flex-col shrink-0 transition-all duration-500 relative z-10 overflow-y-auto custom-scrollbar h-[38vh] lg:h-auto">
+                        <div class="w-full lg:w-[360px] xl:w-[420px] bg-[#0a0a0a] p-5 lg:p-7 flex flex-col shrink-0 transition-all duration-500 relative z-10 overflow-y-auto custom-scrollbar h-[38dvh] lg:h-auto">
                             <!-- Section Progress Tracker / Word Selector -->
                             <div class="mb-5">
                                 <div class="flex items-center justify-between mb-2">
@@ -1604,7 +1660,7 @@
             `).join('');
 
             return `
-                <div class="flex flex-col lg:flex-row h-auto min-h-[85vh] w-full bg-[#050507] rounded-2xl border border-white/10 overflow-hidden shadow-2xl relative select-none p-4 lg:p-6 gap-6">
+                <div class="flex flex-col lg:flex-row h-auto min-h-[85dvh] w-full bg-[#050507] rounded-2xl border border-white/10 overflow-hidden shadow-2xl relative select-none p-4 lg:p-6 gap-6">
                     <!-- LEFT: RETRO-MODERN TV CHASSIS -->
                     <div class="flex-1 bg-[#0a0a0e] rounded-2xl border-2 border-white/15 p-4 lg:p-6 flex flex-col justify-between shadow-[0_20px_50px_rgba(0,0,0,0.9)] relative">
                         <!-- TV Top Bezel -->
@@ -1941,10 +1997,10 @@
             }).join('');
 
             return `
-                <div class="w-full h-full flex flex-col md:flex-row gap-12 p-8 max-w-6xl items-center justify-center">
+                <div class="w-full h-full flex flex-col md:flex-row gap-6 md:gap-12 p-2 md:p-8 max-w-6xl items-center justify-center">
                     
                     <!-- Left: Cassette Rack -->
-                    <div class="cassette-rack w-full md:w-1/3 flex flex-col gap-6 overflow-y-auto max-h-[80vh] pr-4 custom-scrollbar">
+                    <div class="cassette-rack w-full md:w-1/3 flex flex-col gap-6 overflow-y-auto max-h-[80dvh] pr-4 custom-scrollbar">
                         <h3 class="text-neon font-bold text-xl uppercase tracking-widest mb-2 border-b border-gray-700 pb-2 flex items-center justify-between">
                             <span>Archives</span>
                             <span class="text-xs text-gray-400 font-mono font-normal">CASSETTES</span>
@@ -1954,7 +2010,7 @@
 
                     <!-- Right: CRT Setup -->
                     <div class="crt-setup w-full md:w-2/3 flex flex-col items-center justify-center">
-                        <div class="crt-monitor w-full aspect-[4/3] p-8 flex flex-col">
+                        <div class="crt-monitor w-full aspect-[4/3] p-4 md:p-8 flex flex-col">
                             <div class="scanlines absolute inset-0 pointer-events-none opacity-40 z-10"></div>
                             <div id="crt-screen-content" class="crt-text font-mono text-sm md:text-base lg:text-lg whitespace-pre-wrap z-0 flex-grow">
                                 > SYSTEM ONLINE.
@@ -2038,9 +2094,10 @@
         camera.position.set(2, 24, 24);
         camera.lookAt(2, 0, 0);
 
-        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        const isSmallScreen = Math.min(window.innerWidth, window.innerHeight) < 768;
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
         renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, isSmallScreen ? 1.5 : 2));
         renderer.shadowMap.enabled = true;
         renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -2054,8 +2111,8 @@
         const dirLight = new THREE.DirectionalLight(0xffffff, 1.4);
         dirLight.position.set(12, 28, 16);
         dirLight.castShadow = true;
-        dirLight.shadow.mapSize.width = 2048;
-        dirLight.shadow.mapSize.height = 2048;
+        dirLight.shadow.mapSize.width = isSmallScreen ? 1024 : 2048;
+        dirLight.shadow.mapSize.height = isSmallScreen ? 1024 : 2048;
         dirLight.shadow.camera.left = -15;
         dirLight.shadow.camera.right = 15;
         dirLight.shadow.camera.top = 15;
@@ -2564,20 +2621,57 @@
             }
         });
 
+        // --- Responsive camera framing ---
+        // Keeps the whole board visible on any aspect ratio and, on phones,
+        // lifts it above the bottom navigation dock.
+        const view = { k: 1, lookX: 0, lookZ: 0 };
+        function fitCamera() {
+            const w = window.innerWidth, h = window.innerHeight;
+            const aspect = w / h;
+            const narrow = w < 768;
+            renderer.setSize(w, h);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, Math.min(w, h) < 768 ? 1.5 : 2));
+            camera.aspect = aspect;
+
+            const baseVisibleH = 2 * 33.9 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)); // ~24.7 world units
+            // Width of board (+labels) we want visible; extra room on desktop for the sidebar
+            const needW = narrow ? 21 : 26;
+            view.k = Math.max(1, needW / (baseVisibleH * aspect));
+            if (!narrow) {
+                // Also make sure the board fits vertically on very wide/short windows
+                view.k = Math.max(view.k, 21 / baseVisibleH);
+            }
+            if (narrow) {
+                const nav = document.getElementById('side-nav');
+                const navFrac = nav ? Math.min(0.6, nav.getBoundingClientRect().height / h) : 0.2;
+                view.lookX = 2;                              // center the board (it is offset +2 in its group)
+                view.lookZ = 17.5 * navFrac * view.k;        // lift board above the dock
+            } else {
+                view.lookX = 0;                              // desktop: board sits right of the sidebar
+                view.lookZ = 0;
+            }
+            camera.updateProjectionMatrix();
+        }
+
         function animate() {
             requestAnimationFrame(animate);
             // Gentle ambient camera rotation for aesthetic feel
             if(!currentPiece && !isAnimating) {
-                camera.position.x = Math.sin(Date.now() * 0.0001) * 2;
-                camera.lookAt(0, 0, 0);
+                camera.position.set(view.lookX + Math.sin(Date.now() * 0.0001) * 2, 24 * view.k, 24 * view.k + view.lookZ);
+                camera.lookAt(view.lookX, 0, view.lookZ);
             }
             renderer.render(scene, camera);
         }
 
-        window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
+        let resizeTimer = null;
+        const onViewportChange = () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(fitCamera, 60); };
+        window.addEventListener('resize', onViewportChange);
+        window.addEventListener('orientationchange', onViewportChange);
+        if (window.visualViewport) window.visualViewport.addEventListener('resize', onViewportChange);
+        fitCamera();
+
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && !overlay.classList.contains('pointer-events-none')) document.getElementById('close-overlay').click();
         });
 
         window.onload = animate;
