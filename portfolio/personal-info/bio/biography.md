@@ -1,0 +1,9 @@
+# Biography — Johan Sofalas
+
+Johan Sofalas is a Colombo-based AI researcher, data scientist, and storyteller. He believes that creativity is the greatest gift humanity possesses, a force not limited to the arts, but the very engine that drives scientific discovery and technological innovation. To Johan, engineering a machine learning pipeline, running a rigorous statistical model, and weaving a compelling narrative are all expressions of the exact same creative spirit.
+
+In his technical life, Johan’s curiosity is anchored in artificial intelligence and data science. His research operates at the cutting edge of two distinct but fascinating fields: computational linguistics and cheminformatics. Whether he is architecting natural language processing frameworks to understand and translate low-resource languages, or applying deep learning models to predict complex chemical interactions for environmental solutions, he uses AI as a tool to decode the hidden structures of the world around us.
+
+But the terminal is only one of his canvases. When he steps away from the data, Johan channels that same creative energy into writing poetry and authoring novels. He is also an avid game designer, spending his free time inventing tabletop board games, balancing mechanics, and building interactive experiences simply for the joy of play.
+
+Ultimately, behind the neural networks, the research papers, and the fictional universes, Johan is just an ordinary guy having a great time building the things he loves. This portfolio isn't just a showcase of his work, it is a digital playground where science, art, and play all share the exact same space.
